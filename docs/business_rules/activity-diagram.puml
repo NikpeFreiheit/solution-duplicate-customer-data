@@ -1,0 +1,56 @@
+@startuml
+start
+
+title Normalization and Validation activity diagram
+
+:Non-normalized application;
+->**Normalization**;
+
+:Normalized application;
+->**Validation**
+Comparison of 
+the application with 
+the application from 
+the database;
+
+:Do the applications match?;
+
+'Scenario 1
+split
+->**Scenario 1**;
+:Requests are automatically
+processed (merged)
+by the system;
+end
+
+
+'Scenario 2
+split again
+->**Scenario 2**;
+:Applicetion group for processing
+----
+Normalized application
+and
+The application from the database;
+->**Assignment of a grouped** 
+**application to**
+**an employee for processing**;
+if (Is the individual in applications the same person?) then (Yes)
+      :The application from the database is designated as the master application.
+      The new duplicate application is moved to the //Archive table// 
+      in the database to preserve request history;
+    end
+    else (No)
+      :A new application is created in the system
+      and stored in the database;
+    end
+    endif
+
+'Scenario 3
+split again
+->**Scenario 3**;
+:A new application is created in the system
+and stored in the database;
+end
+
+@enduml

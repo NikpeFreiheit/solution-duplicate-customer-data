@@ -1,0 +1,53 @@
+@startuml
+'https://plantuml.com/sequence-diagram
+
+skinparam actorStyle awesome
+autonumber
+
+title Submission of data by the Company Employee to the system
+
+actor "Company\nEmployee" as user
+
+box Monolithic CRM System #LightSteelBlue
+    participant "User\nInterface" as ui
+    participant "CRM\nBackend" as crm
+end box
+
+database "Backup\nDatabase" as rdb
+participant "Normalization\nService" as norm
+participant "Application Validation\nand Grouping Service" as valid
+database "Database" as db
+
+user-> ui: Creating an application\n**Application data:**\n*First Name\n*Last Name\n*Phone number\n*Address\n*Email\n*SSN
+ui -> crm: **Send application data**
+alt Normalization or validation service is unavailable.
+    crm-->ui:**Save operation failed**\n**Follow the instructions**
+end
+crm->rdb:**Save non-normalized application data**\nPOST\n{Application data}
+crm-->ui: **Application saved**
+ui-->user: **Application processing status in the system**
+norm->rdb: **Scheduled normalization of submitted applications**\n//API call JSON/HTTP//\nGET\n{Application data}
+rdb-->norm: API response
+activate norm
+    norm->norm: **Clean and normalize application data**
+    norm->valid: **Send normalized application data**\n//API call JSON/HTTP//\nPOST\n{Application data}
+deactivate norm
+valid-->norm: API response
+activate valid
+    valid->valid: **Validation and Grouping application**
+    valid->db: **Save application to the database**\n//API call JSON/HTTP//\nPOST\n{Application data}
+    db-->valid: API response
+    alt Duplicate confirmation required
+        valid->crm: //API call JSON/HTTP//\nPOST\n{Application data}
+        crm->ui: **Send grouped application data**
+        ui->user: **Ask confirmation**
+        user->ui: **Confirmation/Non-confirmation**
+        ui->crm: **Result**
+        crm-->valid: API response
+        valid->db: **Save application to the database**\n//API call JSON/HTTP//\nPOST\n{Application data}
+        db-->valid: API response
+    end
+
+deactivate valid
+
+@enduml

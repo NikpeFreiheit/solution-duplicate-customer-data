@@ -1,0 +1,21 @@
+@startuml
+
+left to right direction
+hide empty description 
+
+title Application state
+
+state Lead
+state Consented
+state Enrollment
+state Completed
+state Cancelled
+state Archive
+
+Lead->Archive
+Lead->Consented
+Consented->Enrollment
+Enrollment->Completed
+Enrollment->Cancelled
+Consented->Cancelled
+@enduml

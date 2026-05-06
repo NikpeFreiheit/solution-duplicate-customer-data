@@ -1,0 +1,45 @@
+@startuml
+
+title Conceptual ER model
+
+entity "applications" as applications {
+  * id : integer
+  --
+  src_system : integer
+  appl_number : integer
+  appl_date : date
+}
+
+entity "persons" as persons {
+  * id : integer
+  --
+  applications_id : integer
+  first_name : text
+  last_name : text
+  SSN : text
+}
+
+entity "contacts" as contacts {
+  * id : integer
+  --
+  person_id : integer
+  client_phones : text
+  addresses : text
+  emails : text
+}
+
+entity "contracts" as contracts {
+  * id : integer
+  --
+  applications_id : integer
+  person_id : integer
+  contract_number : text
+  amount : double precision
+}
+
+applications ||--o{ persons : has
+persons ||--o{ contacts : has
+applications ||--o{ contracts : has
+persons ||--o{ contracts : has
+
+@enduml

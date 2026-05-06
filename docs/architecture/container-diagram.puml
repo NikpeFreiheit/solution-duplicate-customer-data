@@ -1,0 +1,34 @@
+@startuml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+LAYOUT_WITH_LEGEND()
+
+' Standard configuration for compatibility
+set separator none
+
+title Container Diagram
+
+' External Systems
+Person_Ext(partner, "Partner", "External system that transmits data to the company's system.")
+System_Ext(ssn_service, "SSN Service", "Service with the ability to verify identity by SSN.")
+
+' System Boundary
+System_Boundary(cms_boundary, "Customer Management System") {
+    
+    Container(back, "Monolithic CRM System (UI + Backend)", "Software System", "System for managing and enters applications,contacts, contracts, and customer profiles.")
+    Container(validation_service, "Application Normalization and Validation Service", "Software System", "Normalizes and validates applications to prevent duplicates in the system.")
+    Container(crm, "CRM", "Software System", "System for managing applications, contacts, contracts, and customer profiles.")
+    Container(db, "Database", "Postgres","Storage of normalized and validated data from the CRM system")
+}
+
+Person(employee, "Company Employee", "Communicates with the client. Enters applications into the system.")
+
+' Relationships
+Rel(back, employee, "Retrieval of client data for communication and client verification")
+Rel(employee, back, "Creation and management of applications, retrieval of client data, and client verification")
+Rel(back, validation_service, "Makes API calls", "JSON/HTTP")
+Rel(validation_service, crm, "Makes API calls", "JSON/HTTP")
+Rel(validation_service, db, "Makes API calls", "JSON/HTTP")
+Rel(back, db, "Makes API calls", "JSON/HTTP")
+Rel(back, ssn_service, "Makes API calls", "JSON/HTTP")
+Rel(partner, validation_service, "Makes API calls", "JSON/HTTP")
+@enduml

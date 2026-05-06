@@ -1,0 +1,43 @@
+@startuml
+'https://plantuml.com/sequence-diagram
+
+skinparam actorStyle awesome
+autonumber
+
+title Submission of data by the partner to the system
+
+actor "Company\nPartner" as user
+participant "API\ngateway" as api
+database "Backup\nDatabase" as rdb
+participant "Normalization\nService" as norm
+participant "Validation\n and Grouping\nService" as valid
+participant "CRM\nBackend" as crm
+database "Long-term\ndata storage" as db
+
+user->api: **Submit application for creation**//API call JSON/HTTP//\nPOST\n{Application data}
+api-->user:200 OK \n"Application sent"
+alt Normalization or validation service is unavailable
+    api-->user://API call JSON/HTTP//\n500 Internal Server Error
+end
+api->rdb: **Save non-normalized application to backup storage**\n//API call JSON/HTTP//\nPOST\n{Application data}
+rdb-->api: API response
+norm->rdb: **Scheduled normalization of submitted applications**\n//API call JSON/HTTP//\nGET\n{Application data}
+rdb-->norm: API response
+activate norm
+    norm->norm: **Clean and normalize application data**
+    norm->valid: **Send normalized application data**\n//API call JSON/HTTP//\nPOST\n{Application data}
+deactivate norm
+valid-->norm: API response
+activate valid
+    valid->db: **Check for duplicate data**\n//API call JSON/HTTP//\nGET\n{Application data}
+    db-->valid: API response
+    valid->valid: **Validation and Grouping application**
+    alt Duplicate confirmation required
+        valid->crm: //API call JSON/HTTP//\nPOST\n{Application data}
+        crm-->valid: API response
+    end
+valid->db: **Save application to the database**\n//API call JSON/HTTP//\nPOST\n{Application data}
+db-->valid: API response
+deactivate valid
+
+@enduml

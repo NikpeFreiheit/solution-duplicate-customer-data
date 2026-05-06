@@ -1,0 +1,18 @@
+@startuml
+'https://plantuml.com/sequence-diagram
+
+autonumber
+
+title "System check SSN diagram"
+
+participant "SSN Service" as ssn
+participant "CRM" as crm
+database "Long-term \ndata storage" as db
+crm->db: **Request client data from DB**\n//API call JSON/HTTP//\nGET\n{Client data}
+db-->crm: API response\n{Client data}
+crm->ssn: //API call JSON/HTTP//\nPOST\n{Client data+\nSSN verification request}
+activate ssn
+ssn-->crm: //API call JSON/HTTP//\nPOST\n{Client data+\nSSN verification result}
+deactivate ssn
+crm->db: **Save enrich client data**\n//API call JSON/HTTP//\nPOST\n{Enrich client data}
+@enduml

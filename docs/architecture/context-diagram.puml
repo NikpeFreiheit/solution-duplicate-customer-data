@@ -1,0 +1,19 @@
+@startuml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Context.puml
+
+LAYOUT_WITH_LEGEND()
+
+title Context diagram
+
+Person(employee, "Company Employee", "Communicates with the client. Enters applications into the system.")
+System(customer_system, "Customer Management System", "System for working with and managing applications, contacts, contracts, and customer cards and their statuses.")
+
+Person_Ext(partner, "Partner", "External system that transmits data to the company's system.")
+System_Ext(ssn_service, "SSN Service", "Service with the ability to verify identity by SSN.")
+
+Rel(employee, customer_system, "Application entry and management, obtaining customer data, customer verification")
+Rel(customer_system, employee, "Obtaining client data for communication, client verification")
+Rel(partner, customer_system, "Sending application data")
+Rel(customer_system, ssn_service, "Identity verification via SSN")
+
+@enduml

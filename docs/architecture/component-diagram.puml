@@ -1,0 +1,48 @@
+@startuml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
+LAYOUT_WITH_LEGEND()
+
+' Standard configuration for compatibility
+set separator none
+
+title Component Diagram
+
+' External Systems
+Person_Ext(partner, "Partner", "External system that transmits data to the company's system.")
+System_Ext(ssn_service, "SSN Service", "Service with the ability to verify identity by SSN.")
+
+
+' System Boundary
+System_Boundary(cms_boundary, "Application Normalization and Validation Service") {
+    Component(normalization_service, "Normalization Service", "Software System", "Performs data normalization according to defined rules.")
+    Component(validation_service, "Application Validation and Grouping Service", "Software System", "Validates applications by comparing them against existing data in the system based on defined rules and groups duplicate applications together.")
+    Component(api,"API Gateway",,)
+    Component(backup_db, "Backup Database", "MongoDB", "Database for backup storage of applications in case of validation service failure.")
+}
+System_Boundary(crm_monolith, "Monolithic CRM System (UI + Backend)"){
+    Component(crm, "CRM (Backend)", "Software System", "System for managing applications, contacts, contracts, and customer profiles.")
+    Component(ui, "UI", "Software System", "System for managing and enters applications.")
+}
+
+
+
+Container(db, "Database", "Postgres","Storage of normalized and validated data from the CRM system")
+Person(employee, "Company Employee", "Communicates with the client. Enters applications into the system.")
+
+' Relationships
+Rel(employee, ui, "Creation and management of applications, retrieval of client data, and client verification")
+Rel(ui, employee, "Retrieval of client data for communication and client verification")
+
+Rel(normalization_service, validation_service, "Validate and group application", "JSON/HTTP")
+Rel(validation_service, db, "Check for duplicate or save application after validation and grouping (or save if no duplicate is found)", "JSON/HTTP")
+Rel(validation_service, crm, "Duplicate confirmation required", "JSON/HTTP")
+Rel(crm, ui,  "Duplicate confirmation required", "JSON/HTTP")
+
+Rel(partner, api, "Submit application for creation", "JSON/HTTP")
+Rel(backup_db, normalization_service, "Normalize submitted application", "JSON/HTTP")
+Rel(api, backup_db, "POST to backup storage", "JSON/HTTP")
+
+Rel(crm, db, "Retrieve data for standard application processing", "JSON/HTTP")
+Rel(crm, ssn_service, "SSN verification request", "JSON/HTTP")
+
+@enduml
