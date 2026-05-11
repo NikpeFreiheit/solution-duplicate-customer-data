@@ -1,8 +1,32 @@
 {
-    "Application": {
-        "src_system": "int",
-        "appl_number": "int",
-        "appl_date": "string",
+    "collections": {
+        "Application": {
+            "src_system": "int",
+            "appl_number": "int",
+            "appl_date": "string",
+            "Person": {
+                "first_name": "string",
+                "last_name": "string",
+                "SSN": "string",
+                "Contacts": {
+                    "client_phones": [
+                        {
+                            "number": "string"
+                        }
+                    ],
+                    "addresses": [
+                        {
+                            "address": "string"
+                        }
+                    ],
+                    "emails": [
+                        {
+                            "email": "string"
+                        }
+                    ]
+                }
+            }
+        },
         "Person": {
             "first_name": "string",
             "last_name": "string",
@@ -25,5 +49,9 @@
                 ]
             }
         }
+    },
+    "Contract":{
+            "contract_number":"string",
+            "amount":"string"
     }
 }

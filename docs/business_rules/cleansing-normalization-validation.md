@@ -12,9 +12,9 @@ Standardizing data into a unified format:
 - All **First Name** and **Last Name** values are converted to a single case (uppercase letters)
 - All **First Name** and **Last Name** values are cleaned from all characters except A–Z and “-” (for double-barreled names and surnames)
 - All **Client Phone** values are converted to the NANP format (*North American Numbering Plan*)
-`It is assumed that the UI allows the user to select the country separately and enter the remaining part of the phone number independently, potentially using an input mask.
-Advantage: enables the use of different input masks for different countries (as well as regions within a country).
-Disadvantages: the list of countries (and regions within each country) may become large; the phone number is no longer treated as a single unified entity (or requires preprocessing before storage and display)`
+>It is assumed that the UI allows the user to select the country separately and enter the remaining part of the phone number independently, potentially using an input mask.
+<br>**Advantage**: enables the use of different input masks for different countries (as well as regions within a country).
+Disadvantages: the list of countries (and regions within each country) may become large; the phone number is no longer treated as a single unified entity (or requires preprocessing before storage and display)
 
 
 The valid NANP phone number format is:
