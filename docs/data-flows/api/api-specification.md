@@ -1,6 +1,5 @@
 # Mapping API
 
-[JSON messages](https://www.notion.so/JSON-messages-4b45e89c440f4d709be7d53a48283ad2?pvs=21)
 
 **API Request Structure Table**
 
@@ -50,7 +49,6 @@ Each request returns up to 100 records (`limit=100`). |
 1 is manually entered data |
 | appl_number | string | y |  | Application number |
 | appl_date | string | y |  | Datatime format 
-
 dd-mm-yyyy hh:mm:ss |
 | **person[]** | **massive** | **y** | **-** | **-** |
 | *massive* | - | - | - | - |

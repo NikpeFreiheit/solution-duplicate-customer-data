@@ -1,45 +1,86 @@
 @startuml
+!theme plain
+hide circle
+skinparam linetype ortho
 
-title Conceptual ER model
-
-entity "applications" as applications {
-  * id : integer
-  --
-  src_system : integer
-  appl_number : integer
-  appl_date : date
-}
+note "src_system values:\n0 = API Gateway\n1 = CRM System\n(Determined in MongoDB)" as N1 #LightGoldenRodYellow
 
 entity "persons" as persons {
-  * id : integer
+  * id : bigserial <<PK>>
   --
-  applications_id : integer
-  first_name : text
-  last_name : text
+  * src_system : smallint
+  * first_name : text
+  * last_name : text
   SSN : text
 }
 
-entity "contacts" as contacts {
-  * id : integer
+entity "applications" as applications {
+  * id : bigserial <<PK>>
   --
-  person_id : integer
-  client_phones : text
-  addresses : text
-  emails : text
+  * person_id : bigint <<FK>>
+  * src_system : smallint
+  * appl_number : integer
+  * appl_date : timestamp
+}
+
+entity "client_phones" as client_phones {
+  * id : bigserial <<PK>>
+  --
+  * person_id : bigint <<FK>>
+  * src_system : smallint
+  * phone_number : text
+  phone_type : text
+}
+
+entity "client_addresses" as client_addresses {
+  * id : bigserial <<PK>>
+  --
+  * person_id : bigint <<FK>>
+  * src_system : smallint
+  * address : text
+}
+
+entity "client_emails" as client_emails {
+  * id : bigserial <<PK>>
+  --
+  * person_id : bigint <<FK>>
+  * src_system : smallint
+  * email : text
 }
 
 entity "contracts" as contracts {
-  * id : integer
+  * id : bigserial <<PK>>
   --
-  applications_id : integer
-  person_id : integer
-  contract_number : text
-  amount : double precision
+  * applications_id : bigint <<FK>>
+  * person_id : bigint <<FK>>
+  * src_system : smallint
+  contract_id : text
+  amount : decimal(15,4)
 }
 
-applications ||--o{ persons : has
-persons ||--o{ contacts : has
-applications ||--o{ contracts : has
-persons ||--o{ contracts : has
+entity "deduplication_queue" as deduplication_queue {
+  * id : bigserial <<PK>>
+  --
+  target_person_id : bigint <<FK>>
+  candidate_person_id : bigint <<FK>>
+  * src_system : smallint
+  raw_candidate_data : json
+  match_scenario : smallint
+  status : text
+  created_at : timestamp
+}
+
+' Relations
+persons ||--o{ applications
+persons ||--o{ client_phones
+persons ||--o{ client_addresses
+persons ||--o{ client_emails
+persons ||--o{ contracts
+
+' Self-reference style for deduplication
+persons ||--o{ deduplication_queue : "target"
+persons ||--o{ deduplication_queue : "candidate"
+
+applications ||--o{ contracts
 
 @enduml

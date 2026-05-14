@@ -6,13 +6,15 @@ autonumber
 title "System check SSN diagram"
 
 participant "SSN Service" as ssn
-participant "CRM" as crm
+participant "CRM\nBackend" as crm
 database "Long-term \ndata storage" as db
-crm->db: **Request client data from DB**\n//API call JSON/HTTP//\nGET\n{Client data}
-db-->crm: API response\n{Client data}
-crm->ssn: //API call JSON/HTTP//\nPOST\n{Client data+\nSSN verification request}
+crm->db: **Request client data from DB**\n//Select from...//
+activate crm
+crm->crm: Mapping data from DB\nto JSON format
+crm->ssn: **SSN verification request**\n//API call JSON/HTTP//\nPOST\n{Client data+\nSSN}
+deactivate crm
 activate ssn
-ssn-->crm: //API call JSON/HTTP//\nPOST\n{Client data+\nSSN verification result}
+ssn-->crm: API response\nSSN Verification result
 deactivate ssn
-crm->db: **Save enrich client data**\n//API call JSON/HTTP//\nPOST\n{Enrich client data}
+crm->db: **Save enrich client data**\n//Insert to...//
 @enduml

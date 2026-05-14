@@ -1,0 +1,75 @@
+openapi: 3.0.3
+info:
+  title: CRM SSN Integration API
+  description: Example YAML for the external SSN service request
+  version: 1.0.0
+
+servers:
+  - url: https://api.ssn.com/v1
+
+paths:
+  /ssn_service:
+    post:
+      summary: SSN verification request
+      description: Posting data for verification on external SSN service
+      operationId: ssnVerification
+      tags:
+        - ssnService
+        - ssnVerification
+        - ssn
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ssnRequest'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ssn:
+                    type: string
+                    example: "078-05-1120"
+                  verification_status:
+                    type: string
+                    enum:
+                      - Verified
+                      - Not verified
+                      - No matching information found
+                    example: "Verified"
+        '400':
+          description: Request payload validation failed
+        '500':
+          description: Internal Server Error
+        '503':
+          description: Service Unavailable
+
+components:
+  schemas: 
+    ssnRequest:
+      type: object
+      required:
+        - ssn
+        - first_name
+        - last_name
+      properties:
+        first_name:
+          type: string
+          example: "John"
+        last_name:
+          type: string
+          example: "Doe"
+        ssn:
+          type: string
+          nullable: true
+          example: "123-456-789"
+
+  securitySchemes:
+      ApiKeyAuth:
+        type: apiKey
+        in: header
+        name: X-API-KEY

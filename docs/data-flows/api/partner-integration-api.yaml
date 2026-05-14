@@ -1,0 +1,150 @@
+openapi: 3.0.3
+info:
+  title: Partner Integration API
+  description: API for receiving partner applications and persisting customer data
+  version: 1.0.0
+
+servers:
+  - url: https://api.partner.com/v1
+    description: Production server
+
+paths:
+  /partner_applications:
+    post:
+      summary: Create a new application
+      description: Accepts customer data from a partner and returns the unique ID of the created application
+      operationId: createApplication
+      tags:
+        - Applications
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PersonRequest'
+      responses:
+        '201':
+          description: Application successfully saved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        '400':
+          description: Request payload validation failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+components:
+  schemas:
+
+    PersonRequest:
+      type: object
+      required:
+        - first_name
+        - last_name
+      properties:
+        first_name:
+          type: string
+          example: "John"
+        last_name:
+          type: string
+          example: "Doe"
+        SSN:
+          type: string
+          example: "123-45-6789"
+        Contacts:
+          $ref: '#/components/schemas/ContactsObject'
+
+    ContactsObject:
+      type: object
+      properties:
+        client_phones:
+          type: array
+          items:
+            $ref: '#/components/schemas/PhoneItem'
+        addresses:
+          type: array
+          items:
+            $ref: '#/components/schemas/AddressItem'
+        emails:
+          type: array
+          items:
+            $ref: '#/components/schemas/EmailItem'
+
+    PhoneItem:
+      type: object
+      properties:
+        number:
+          type: string
+          example: "123-456-7890"
+        type:
+          type: string
+          enum: [mobile, work, home]
+          example: "mobile"
+
+    AddressItem:
+      type: object
+      properties:
+        address:
+          type: string
+          example: "123 Main St"
+
+    EmailItem:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+          example: "john@example.com"
+
+    SuccessResponse:
+      type: object
+      properties:
+        message:
+          type: object
+          properties:
+            appl_number:
+              type: integer
+              description: Unique application number
+              example: 10254
+            description:
+              type: string
+              example: "The application has been saved."
+            save_date:
+              type: string
+              format: date-time
+              description: "Database insertion timestamp (UTC, ISO 8601 format)"
+              example: "2023-01-01T12:00:00Z"
+
+    ErrorResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          example: "error"
+        code:
+          type: string
+          example: "VALIDATION_ERROR"
+        message:
+          type: string
+          example: "Request payload validation failed"
+        details:
+          type: array
+          description: List of specific validation errors (400 code only)
+          items:
+            type: object
+            properties:
+              field:
+                type: string
+                example: "first_name, last_name"
+              issue:
+                type: string
+                example: "Fields is required"

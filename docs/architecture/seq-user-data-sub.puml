@@ -38,7 +38,7 @@ activate valid
     valid->db: **Save application to the database**\n//API call JSON/HTTP//\nPOST\n{Application data}
     db-->valid: API response
     alt Duplicate confirmation required
-        valid->crm: //API call JSON/HTTP//\nPOST\n{Application data}
+        db->crm: //API call JSON/HTTP//\nPOST\n{Application data}
         crm->ui: **Send grouped application data**
         ui->user: **Ask confirmation**
         user->ui: **Confirmation/Non-confirmation**
